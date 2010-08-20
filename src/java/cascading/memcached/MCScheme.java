@@ -34,7 +34,7 @@ import org.apache.hadoop.mapred.OutputCollector;
 /**
  *
  */
-public class MCScheme extends Scheme
+public abstract class MCScheme<V> extends Scheme
   {
   String keyDelim = ":";
   Fields keyFields;
@@ -79,6 +79,8 @@ public class MCScheme extends Scheme
     String key = tupleEntry.selectTuple( keyFields ).toString( keyDelim, false );
     Tuple value = tupleEntry.selectTuple( valueFields );
 
-    outputCollector.collect( key, value );
+    collect( key, value, outputCollector );
     }
+
+  protected abstract void collect( String key, Tuple value, OutputCollector<String, V> outputCollector ) throws IOException;
   }

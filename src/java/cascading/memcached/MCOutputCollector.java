@@ -35,7 +35,7 @@ import org.apache.hadoop.mapred.OutputCollector;
 /**
  *
  */
-public class MCOutputCollector extends TupleEntryCollector implements OutputCollector<String, Tuple>
+public class MCOutputCollector<V> extends TupleEntryCollector implements OutputCollector<String, V>
   {
   private MemcachedClient client;
   private CacheLoader cacheLoader;
@@ -53,6 +53,12 @@ public class MCOutputCollector extends TupleEntryCollector implements OutputColl
     }
 
   @Override
+  public void collect( String key, V value ) throws IOException
+    {
+    cacheLoader.push( key, value );
+    }
+
+  @Override
   protected void collect( Tuple tuple )
     {
     }
@@ -61,11 +67,5 @@ public class MCOutputCollector extends TupleEntryCollector implements OutputColl
   public void close()
     {
     client.shutdown( 60, TimeUnit.SECONDS );
-    }
-
-  @Override
-  public void collect( String key, Tuple value ) throws IOException
-    {
-    cacheLoader.push( key, value );
     }
   }

@@ -21,6 +21,8 @@
 
 package cascading.memcached;
 
+import java.io.IOException;
+
 import cascading.ClusterTestCase;
 import cascading.flow.Flow;
 import cascading.flow.FlowConnector;
@@ -29,6 +31,10 @@ import cascading.scheme.TextDelimited;
 import cascading.tap.Hfs;
 import cascading.tap.Tap;
 import cascading.tuple.Fields;
+import cascading.tuple.Tuple;
+import net.spy.memcached.AddrUtil;
+import net.spy.memcached.ConnectionFactoryBuilder;
+import net.spy.memcached.MemcachedClient;
 
 /**
  *
@@ -43,14 +49,60 @@ public class MCTest extends ClusterTestCase
 
     }
 
-  public void testMemcached()
+  private MemcachedClient getClient() throws IOException
+    {
+    ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder();
+    builder = builder.setProtocol( ConnectionFactoryBuilder.Protocol.BINARY );
+    builder = builder.setOpQueueMaxBlockTime( 1000 );
+
+    return new MemcachedClient( builder.build(), AddrUtil.getAddresses( "localhost:11211" ) );
+    }
+
+//    1 c
+//    2 d
+//    3 c
+//    4 d
+//    5 e
+
+  public void testTupleScheme() throws IOException
+    {
+    MCScheme scheme = new MCTupleScheme( new Fields( "num" ), new Fields( "lower" ) );
+
+    runTestFor( scheme );
+
+    MemcachedClient client = getClient();
+
+    assertEquals( "c", ( (Tuple) client.get( "1" ) ).get( 0 ) );
+    assertEquals( "d", ( (Tuple) client.get( "2" ) ).get( 0 ) );
+    assertEquals( "c", ( (Tuple) client.get( "3" ) ).get( 0 ) );
+    assertEquals( "d", ( (Tuple) client.get( "4" ) ).get( 0 ) );
+    assertEquals( "e", ( (Tuple) client.get( "5" ) ).get( 0 ) );
+
+    client.shutdown();
+    }
+
+  public void testDelimitedScheme() throws IOException
+    {
+    MCScheme scheme = new MCDelimitedScheme( new Fields( "num" ), new Fields( "lower" ) );
+
+    runTestFor( scheme );
+
+    MemcachedClient client = getClient();
+
+    assertEquals( "c", client.get( "1" ) );
+    assertEquals( "d", client.get( "2" ) );
+    assertEquals( "c", client.get( "3" ) );
+    assertEquals( "d", client.get( "4" ) );
+    assertEquals( "e", client.get( "5" ) );
+
+    client.shutdown();
+    }
+
+  private void runTestFor( MCScheme scheme )
     {
     Tap source = new Hfs( new TextDelimited( new Fields( "num", "lower", "upper" ), " " ), inputFile );
 
-    Fields keyFields = new Fields( "num" );
-    Fields valueFields = new Fields( "lower" );
-
-    Tap sink = new MCSinkTap( "localhost:11211", keyFields, valueFields );
+    Tap sink = new MCSinkTap( "localhost:11211", scheme );
 
     Flow flow = new FlowConnector( getProperties() ).connect( source, sink, new Pipe( "identity" ) );
 

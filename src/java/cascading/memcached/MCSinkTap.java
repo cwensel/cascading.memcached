@@ -36,11 +36,6 @@ public class MCSinkTap extends SinkTap
   {
   String hostnames;
 
-  public MCSinkTap( String hostnames, Fields keyFields, Fields valueFields )
-    {
-    this( hostnames, new MCScheme( keyFields, valueFields ) );
-    }
-
   public MCSinkTap( String hostnames, MCScheme scheme )
     {
     super( scheme );
