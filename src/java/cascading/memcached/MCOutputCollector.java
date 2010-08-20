@@ -40,7 +40,6 @@ public class MCOutputCollector extends TupleEntryCollector implements OutputColl
   private MemcachedClient client;
   private CacheLoader cacheLoader;
 
-
   public MCOutputCollector( String hostnames ) throws IOException
     {
     ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder();
