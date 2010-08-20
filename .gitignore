@@ -1,0 +1,6 @@
+build.properties
+.DS_Store
+build
+*.iml
+*.iws
+*.ipr
