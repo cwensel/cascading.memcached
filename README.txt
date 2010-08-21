@@ -16,7 +16,7 @@ Welcome
 
 Building
 
- This release requires at least Cascading 1.1.x. Hadoop 0.19.x,
+ This release requires at least Cascading 1.2.x. Hadoop 0.19.x,
  and the related memcached release.
 
  To build a jar,
