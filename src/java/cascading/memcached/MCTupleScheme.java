@@ -21,24 +21,22 @@
 
 package cascading.memcached;
 
-import java.io.IOException;
-
 import cascading.tuple.Fields;
 import cascading.tuple.Tuple;
-import org.apache.hadoop.mapred.OutputCollector;
+import cascading.tuple.TupleEntry;
 
 /**
  *
  */
-public class MCTupleScheme extends MCScheme<Tuple>
+public class MCTupleScheme extends MCFieldedScheme<Tuple>
   {
   public MCTupleScheme( Fields keyFields, Fields valueFields )
     {
     super( keyFields, valueFields );
     }
 
-  protected void collect( String key, Tuple value, OutputCollector<String, Tuple> outputCollector ) throws IOException
+  protected Tuple getValue( TupleEntry tupleEntry )
     {
-    outputCollector.collect( key, value );
+    return tupleEntry.selectTuple( getValueFields() );
     }
   }

@@ -66,7 +66,7 @@ public class MCTest extends ClusterTestCase
 
   public void testTupleScheme() throws IOException
     {
-    MCScheme scheme = new MCTupleScheme( new Fields( "num" ), new Fields( "lower" ) );
+    MCBaseScheme scheme = new MCTupleScheme( new Fields( "num" ), new Fields( "lower" ) );
 
     runTestFor( scheme );
 
@@ -83,7 +83,7 @@ public class MCTest extends ClusterTestCase
 
   public void testDelimitedScheme() throws IOException
     {
-    MCScheme scheme = new MCDelimitedScheme( new Fields( "num" ), new Fields( "lower" ) );
+    MCBaseScheme scheme = new MCDelimitedScheme( new Fields( "num" ), new Fields( "lower" ) );
 
     runTestFor( scheme );
 
@@ -98,7 +98,7 @@ public class MCTest extends ClusterTestCase
     client.shutdown();
     }
 
-  private void runTestFor( MCScheme scheme )
+  private void runTestFor( MCBaseScheme scheme )
     {
     Tap source = new Hfs( new TextDelimited( new Fields( "num", "lower", "upper" ), " " ), inputFile );
 

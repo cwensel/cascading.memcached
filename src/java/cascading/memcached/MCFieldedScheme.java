@@ -21,30 +21,28 @@
 
 package cascading.memcached;
 
-import java.io.IOException;
-
-import cascading.scheme.Scheme;
-import cascading.tap.Tap;
 import cascading.tuple.Fields;
-import cascading.tuple.Tuple;
 import cascading.tuple.TupleEntry;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.OutputCollector;
 
 /**
  *
  */
-public abstract class MCScheme<V> extends Scheme
+public abstract class MCFieldedScheme<V> extends MCBaseScheme<V>
   {
-  String keyDelim = ":";
-  Fields keyFields;
-  Fields valueFields;
+  private String keyDelim = ":";
+  private Fields keyFields;
+  private Fields valueFields;
 
-  public MCScheme( Fields keyFields, Fields valueFields )
+  public MCFieldedScheme( Fields keyFields, Fields valueFields )
     {
     super( Fields.merge( keyFields, valueFields ) );
     this.keyFields = keyFields;
     this.valueFields = valueFields;
+    }
+
+  public String getKeyDelim()
+    {
+    return keyDelim;
     }
 
   public Fields getKeyFields()
@@ -57,30 +55,10 @@ public abstract class MCScheme<V> extends Scheme
     return valueFields;
     }
 
-  @Override
-  public void sourceInit( Tap tap, JobConf conf ) throws IOException
+  protected String getKey( TupleEntry tupleEntry )
     {
+    return tupleEntry.selectTuple( getKeyFields() ).toString( getKeyDelim(), false );
     }
 
-  @Override
-  public void sinkInit( Tap tap, JobConf conf ) throws IOException
-    {
-    }
-
-  @Override
-  public Tuple source( Object key, Object value )
-    {
-    throw new IllegalStateException( "source should never be called" );
-    }
-
-  @Override
-  public void sink( TupleEntry tupleEntry, OutputCollector outputCollector ) throws IOException
-    {
-    String key = tupleEntry.selectTuple( keyFields ).toString( keyDelim, false );
-    Tuple value = tupleEntry.selectTuple( valueFields );
-
-    collect( key, value, outputCollector );
-    }
-
-  protected abstract void collect( String key, Tuple value, OutputCollector<String, V> outputCollector ) throws IOException;
+  protected abstract V getValue( TupleEntry tupleEntry );
   }

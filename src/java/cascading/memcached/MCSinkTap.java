@@ -24,7 +24,6 @@ package cascading.memcached;
 import java.io.IOException;
 
 import cascading.tap.SinkTap;
-import cascading.tuple.Fields;
 import cascading.tuple.TupleEntryCollector;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.JobConf;
@@ -36,7 +35,7 @@ public class MCSinkTap extends SinkTap
   {
   String hostnames;
 
-  public MCSinkTap( String hostnames, MCScheme scheme )
+  public MCSinkTap( String hostnames, MCBaseScheme scheme )
     {
     super( scheme );
     this.hostnames = hostnames;
@@ -55,10 +54,6 @@ public class MCSinkTap extends SinkTap
 
   public TupleEntryCollector openForWrite( JobConf conf ) throws IOException
     {
-    MCScheme scheme = (MCScheme) getScheme();
-    Fields keyFields = scheme.getKeyFields();
-    Fields valueFields = scheme.getValueFields();
-
     return new MCOutputCollector( hostnames );
     }
 

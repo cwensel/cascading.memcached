@@ -21,30 +21,53 @@
 
 package cascading.memcached;
 
+import java.io.IOException;
+
+import cascading.scheme.Scheme;
+import cascading.tap.Tap;
 import cascading.tuple.Fields;
+import cascading.tuple.Tuple;
 import cascading.tuple.TupleEntry;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.OutputCollector;
 
 /**
  *
  */
-public class MCDelimitedScheme extends MCFieldedScheme<String>
+public abstract class MCBaseScheme<V> extends Scheme
   {
-  String valueDelim = "\t";
 
-  public MCDelimitedScheme( Fields keyFields, Fields valueFields )
+  public MCBaseScheme( Fields sourceFields )
     {
-    super( keyFields, valueFields );
-    }
-
-  public MCDelimitedScheme( Fields keyFields, Fields valueFields, String valueDelim )
-    {
-    super( keyFields, valueFields );
-    this.valueDelim = valueDelim;
+    super( sourceFields );
     }
 
   @Override
-  protected String getValue( TupleEntry tupleEntry )
+  public void sourceInit( Tap tap, JobConf conf ) throws IOException
     {
-    return tupleEntry.selectTuple( getValueFields() ).toString( valueDelim, false );
+    }
+
+  @Override
+  public void sinkInit( Tap tap, JobConf conf ) throws IOException
+    {
+    }
+
+  @Override
+  public Tuple source( Object key, Object value )
+    {
+    throw new IllegalStateException( "source should never be called" );
+    }
+
+  protected abstract String getKey( TupleEntry tupleEntry );
+
+  protected abstract V getValue( TupleEntry tupleEntry );
+
+  @Override
+  public void sink( TupleEntry tupleEntry, OutputCollector outputCollector ) throws IOException
+    {
+    String key = getKey( tupleEntry );
+    V value = getValue( tupleEntry );
+
+    outputCollector.collect( key, value );
     }
   }
