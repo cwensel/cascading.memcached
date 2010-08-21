@@ -39,7 +39,7 @@ public abstract class MCBaseScheme<I, V> extends Scheme
 
   public MCBaseScheme( Fields sinkFields )
     {
-    super( sinkFields );
+    setSinkFields( sinkFields );
     }
 
   @Override
