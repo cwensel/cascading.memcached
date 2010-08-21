@@ -1,4 +1,6 @@
 
+FYI, this is a work in progress (wip) branch, and only works with Cascading wip-1.2.
+
 Welcome
 
  This is the Cascading.Memcached module.
