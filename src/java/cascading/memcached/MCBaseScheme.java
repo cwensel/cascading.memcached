@@ -43,6 +43,12 @@ public abstract class MCBaseScheme<I, V> extends Scheme
     }
 
   @Override
+  public boolean isSource()
+    {
+    return false;
+    }
+
+  @Override
   public void sourceInit( Tap tap, JobConf conf ) throws IOException
     {
     }
