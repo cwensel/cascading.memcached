@@ -34,12 +34,12 @@ import org.apache.hadoop.mapred.OutputCollector;
 /**
  *
  */
-public abstract class MCBaseScheme<V> extends Scheme
+public abstract class MCBaseScheme<I, V> extends Scheme
   {
 
-  public MCBaseScheme( Fields sourceFields )
+  public MCBaseScheme( Fields sinkFields )
     {
-    super( sourceFields );
+    super( sinkFields );
     }
 
   @Override
@@ -58,15 +58,18 @@ public abstract class MCBaseScheme<V> extends Scheme
     throw new IllegalStateException( "source should never be called" );
     }
 
-  protected abstract String getKey( TupleEntry tupleEntry );
+  protected abstract I getIntermediate( TupleEntry tupleEntry );
 
-  protected abstract V getValue( TupleEntry tupleEntry );
+  protected abstract String getKey( I intermediate );
+
+  protected abstract V getValue( I intermediate );
 
   @Override
   public void sink( TupleEntry tupleEntry, OutputCollector outputCollector ) throws IOException
     {
-    String key = getKey( tupleEntry );
-    V value = getValue( tupleEntry );
+    I intermediate = getIntermediate( tupleEntry );
+    String key = getKey( intermediate );
+    V value = getValue( intermediate );
 
     outputCollector.collect( key, value );
     }

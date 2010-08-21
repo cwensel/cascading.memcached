@@ -28,7 +28,7 @@ import cascading.tuple.TupleEntry;
 /**
  *
  */
-public class MCTupleScheme extends MCFieldedScheme<Tuple>
+public class MCTupleScheme extends MCTupleEntryScheme<Tuple>
   {
   public MCTupleScheme( Fields keyFields, Fields valueFields )
     {

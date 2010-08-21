@@ -27,13 +27,13 @@ import cascading.tuple.TupleEntry;
 /**
  *
  */
-public abstract class MCFieldedScheme<V> extends MCBaseScheme<V>
+public abstract class MCTupleEntryScheme<V> extends MCBaseScheme<TupleEntry, V>
   {
   private String keyDelim = ":";
   private Fields keyFields;
   private Fields valueFields;
 
-  public MCFieldedScheme( Fields keyFields, Fields valueFields )
+  public MCTupleEntryScheme( Fields keyFields, Fields valueFields )
     {
     super( Fields.merge( keyFields, valueFields ) );
     this.keyFields = keyFields;
@@ -55,6 +55,13 @@ public abstract class MCFieldedScheme<V> extends MCBaseScheme<V>
     return valueFields;
     }
 
+  @Override
+  protected TupleEntry getIntermediate( TupleEntry tupleEntry )
+    {
+    return tupleEntry;
+    }
+
+  @Override
   protected String getKey( TupleEntry tupleEntry )
     {
     return tupleEntry.selectTuple( getKeyFields() ).toString( getKeyDelim(), false );

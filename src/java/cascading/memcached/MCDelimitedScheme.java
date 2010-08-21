@@ -27,7 +27,7 @@ import cascading.tuple.TupleEntry;
 /**
  *
  */
-public class MCDelimitedScheme extends MCFieldedScheme<String>
+public class MCDelimitedScheme extends MCTupleEntryScheme<String>
   {
   String valueDelim = "\t";
 
