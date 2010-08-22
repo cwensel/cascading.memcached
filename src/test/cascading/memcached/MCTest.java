@@ -66,9 +66,13 @@ public class MCTest extends ClusterTestCase
 
   public void testTupleScheme() throws IOException
     {
-    MCBaseScheme scheme = new MCTupleScheme( new Fields( "num" ), new Fields( "lower" ) );
+    runTupleTest( true );
+    runTupleTest( false );
+    }
 
-    runTestFor( scheme );
+  private void runTupleTest( boolean useBinary ) throws IOException
+    {
+    runTestFor( (MCBaseScheme) new MCTupleScheme( new Fields( "num" ), new Fields( "lower" ) ), useBinary );
 
     MemcachedClient client = getClient();
 
@@ -83,9 +87,13 @@ public class MCTest extends ClusterTestCase
 
   public void testDelimitedScheme() throws IOException
     {
-    MCBaseScheme scheme = new MCDelimitedScheme( new Fields( "num" ), new Fields( "lower" ) );
+    runDelimitedTest( true );
+    runDelimitedTest( false );
+    }
 
-    runTestFor( scheme );
+  private void runDelimitedTest( boolean useBinary ) throws IOException
+    {
+    runTestFor( (MCBaseScheme) new MCDelimitedScheme( new Fields( "num" ), new Fields( "lower" ) ), useBinary );
 
     MemcachedClient client = getClient();
 
@@ -98,11 +106,11 @@ public class MCTest extends ClusterTestCase
     client.shutdown();
     }
 
-  private void runTestFor( MCBaseScheme scheme )
+  private void runTestFor( MCBaseScheme scheme, boolean useBinary )
     {
     Tap source = new Hfs( new TextDelimited( new Fields( "num", "lower", "upper" ), " " ), inputFile );
 
-    Tap sink = new MCSinkTap( "localhost:11211", scheme );
+    Tap sink = new MCSinkTap( "localhost:11211", scheme, useBinary );
 
     Flow flow = new FlowConnector( getProperties() ).connect( source, sink, new Pipe( "identity" ) );
 

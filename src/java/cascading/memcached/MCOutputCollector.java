@@ -42,9 +42,14 @@ public class MCOutputCollector<V> extends TupleEntryCollector implements OutputC
 
   public MCOutputCollector( String hostnames ) throws IOException
     {
+    this( hostnames, true );
+    }
+
+  public MCOutputCollector( String hostnames, boolean useBinary ) throws IOException
+    {
     ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder();
 
-    ConnectionFactoryBuilder.Protocol protocol = ConnectionFactoryBuilder.Protocol.BINARY;
+    ConnectionFactoryBuilder.Protocol protocol = useBinary ? ConnectionFactoryBuilder.Protocol.BINARY : ConnectionFactoryBuilder.Protocol.TEXT;
 
     builder = builder.setProtocol( protocol ).setOpQueueMaxBlockTime( 1000 );
 

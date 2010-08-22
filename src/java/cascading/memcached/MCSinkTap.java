@@ -33,12 +33,20 @@ import org.apache.hadoop.mapred.JobConf;
  */
 public class MCSinkTap extends SinkTap
   {
-  String hostnames;
+  String hostnames = null;
+  boolean useBinaryProtocol = true;
 
   public MCSinkTap( String hostnames, MCBaseScheme scheme )
     {
     super( scheme );
     this.hostnames = hostnames;
+    }
+
+  public MCSinkTap( String hostnames, MCBaseScheme scheme, boolean useBinaryProtocol )
+    {
+    super( scheme );
+    this.hostnames = hostnames;
+    this.useBinaryProtocol = useBinaryProtocol;
     }
 
   public Path getPath()
@@ -54,7 +62,7 @@ public class MCSinkTap extends SinkTap
 
   public TupleEntryCollector openForWrite( JobConf conf ) throws IOException
     {
-    return new MCOutputCollector( hostnames );
+    return new MCOutputCollector( hostnames, useBinaryProtocol );
     }
 
   @Override
@@ -79,5 +87,34 @@ public class MCSinkTap extends SinkTap
   public long getPathModified( JobConf conf ) throws IOException
     {
     return System.currentTimeMillis();
+    }
+
+  @Override
+  public boolean equals( Object object )
+    {
+    if( this == object )
+      return true;
+    if( object == null || getClass() != object.getClass() )
+      return false;
+    if( !super.equals( object ) )
+      return false;
+
+    MCSinkTap mcSinkTap = (MCSinkTap) object;
+
+    if( useBinaryProtocol != mcSinkTap.useBinaryProtocol )
+      return false;
+    if( hostnames != null ? !hostnames.equals( mcSinkTap.hostnames ) : mcSinkTap.hostnames != null )
+      return false;
+
+    return true;
+    }
+
+  @Override
+  public int hashCode()
+    {
+    int result = super.hashCode();
+    result = 31 * result + ( hostnames != null ? hostnames.hashCode() : 0 );
+    result = 31 * result + ( useBinaryProtocol ? 1 : 0 );
+    return result;
     }
   }
