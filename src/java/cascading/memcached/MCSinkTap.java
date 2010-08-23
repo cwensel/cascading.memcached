@@ -86,7 +86,7 @@ public class MCSinkTap extends SinkTap
   @Override
   public long getPathModified( JobConf conf ) throws IOException
     {
-    return System.currentTimeMillis();
+    return 0; // always stale
     }
 
   @Override
