@@ -39,14 +39,21 @@ public class MCOutputCollector<V> extends TupleEntryCollector implements OutputC
   {
   private MemcachedClient client;
   private CacheLoader cacheLoader;
+  private int shutdownTimeoutMin = 1;
 
-  public MCOutputCollector( String hostnames ) throws IOException
+  MCOutputCollector( String hostnames ) throws IOException
     {
     this( hostnames, true );
     }
 
-  public MCOutputCollector( String hostnames, boolean useBinary ) throws IOException
+  MCOutputCollector( String hostnames, boolean useBinary ) throws IOException
     {
+    this( hostnames, useBinary, 1 );
+    }
+
+  MCOutputCollector( String hostnames, boolean useBinary, int shutdownTimeoutMin ) throws IOException
+    {
+    this.shutdownTimeoutMin = shutdownTimeoutMin;
     ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder();
 
     ConnectionFactoryBuilder.Protocol protocol = useBinary ? ConnectionFactoryBuilder.Protocol.BINARY : ConnectionFactoryBuilder.Protocol.TEXT;
@@ -71,6 +78,6 @@ public class MCOutputCollector<V> extends TupleEntryCollector implements OutputC
   @Override
   public void close()
     {
-    client.shutdown( 60, TimeUnit.SECONDS );
+    client.shutdown( shutdownTimeoutMin, TimeUnit.MINUTES );
     }
   }
