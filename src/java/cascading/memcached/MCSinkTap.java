@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import cascading.tap.SinkTap;
 import cascading.tuple.TupleEntryCollector;
+import cascading.util.Util;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.JobConf;
 
@@ -116,5 +117,14 @@ public class MCSinkTap extends SinkTap
     result = 31 * result + ( hostnames != null ? hostnames.hashCode() : 0 );
     result = 31 * result + ( useBinaryProtocol ? 1 : 0 );
     return result;
+    }
+
+  @Override
+  public String toString()
+    {
+    if( hostnames != null )
+      return getClass().getSimpleName() + "[\"" + getScheme() + "\"]" + "[\"" + Util.sanitizeUrl( hostnames ) + "\"]"; // sanitize
+    else
+      return getClass().getSimpleName() + "[\"" + getScheme() + "\"]" + "[not initialized]";
     }
   }
