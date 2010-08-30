@@ -25,7 +25,8 @@ import cascading.tuple.Fields;
 import cascading.tuple.TupleEntry;
 
 /**
- *
+ * Class MCDelimitedScheme will create a string from the values selected by the valueFields delimited by
+ * the given valueDelim (TAB is default).
  */
 public class MCDelimitedScheme extends MCTupleEntryScheme<String>
   {

@@ -30,13 +30,20 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.JobConf;
 
 /**
+ * Class MCSinkTap is a {@link cascading.tap.Tap} class only support sinking data to a Memcached cluster (or cluster supporting
+ * the text and binary protocols).
+ * <p/>
+ * This Tap must be used with a {@link MCBaseScheme} sub-class.
  *
+ * @see cascading.memcached.MCTupleScheme
+ * @see cascading.memcached.MCTupleEntryScheme
+ * @see cascading.memcached.MCDelimitedScheme
  */
 public class MCSinkTap extends SinkTap
   {
   String hostnames = null;
   boolean useBinaryProtocol = true;
-  int replyTimeoutSec = 5;
+  int shutdownTimeoutSec = 5;
   int flushThreshold = 1000;
 
   public MCSinkTap( String hostnames, MCBaseScheme scheme )
@@ -50,17 +57,17 @@ public class MCSinkTap extends SinkTap
     this( hostnames, scheme, useBinaryProtocol, 1 );
     }
 
-  public MCSinkTap( String hostnames, MCBaseScheme scheme, boolean useBinaryProtocol, int replyTimeoutSec )
+  public MCSinkTap( String hostnames, MCBaseScheme scheme, boolean useBinaryProtocol, int shutdownTimeoutSec )
     {
-    this( hostnames, scheme, useBinaryProtocol, replyTimeoutSec, 1000 );
+    this( hostnames, scheme, useBinaryProtocol, shutdownTimeoutSec, 1000 );
     }
 
-  public MCSinkTap( String hostnames, MCBaseScheme scheme, boolean useBinaryProtocol, int replyTimeoutSec, int flushThreshold )
+  public MCSinkTap( String hostnames, MCBaseScheme scheme, boolean useBinaryProtocol, int shutdownTimeoutSec, int flushThreshold )
     {
     super( scheme );
     this.hostnames = hostnames;
     this.useBinaryProtocol = useBinaryProtocol;
-    this.replyTimeoutSec = replyTimeoutSec;
+    this.shutdownTimeoutSec = shutdownTimeoutSec;
     this.flushThreshold = flushThreshold;
     }
 
@@ -77,7 +84,7 @@ public class MCSinkTap extends SinkTap
 
   public TupleEntryCollector openForWrite( JobConf conf ) throws IOException
     {
-    return new MCOutputCollector( hostnames, useBinaryProtocol, replyTimeoutSec );
+    return new MCOutputCollector( hostnames, useBinaryProtocol, shutdownTimeoutSec );
     }
 
   @Override

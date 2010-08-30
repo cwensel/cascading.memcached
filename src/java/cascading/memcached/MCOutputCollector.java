@@ -45,7 +45,7 @@ public class MCOutputCollector<V> extends TupleEntryCollector implements OutputC
   private static final Logger LOG = LoggerFactory.getLogger( MCOutputCollector.class );
 
   private MemcachedClient client;
-  private int replyTimeoutSec = 5;
+  private int shutdownTimeoutSec = 5;
   private int flushThreshold = 1000;
 
   private LinkedList<Future> futures = new LinkedList<Future>();
@@ -60,14 +60,14 @@ public class MCOutputCollector<V> extends TupleEntryCollector implements OutputC
     this( hostnames, useBinary, 1 );
     }
 
-  MCOutputCollector( String hostnames, boolean useBinary, int replyTimeoutSec ) throws IOException
+  MCOutputCollector( String hostnames, boolean useBinary, int shutdownTimeoutSec ) throws IOException
     {
-    this( hostnames, useBinary, replyTimeoutSec, 1000 );
+    this( hostnames, useBinary, shutdownTimeoutSec, 1000 );
     }
 
-  MCOutputCollector( String hostnames, boolean useBinary, int replyTimeoutSec, int flushThreshold ) throws IOException
+  MCOutputCollector( String hostnames, boolean useBinary, int shutdownTimeoutSec, int flushThreshold ) throws IOException
     {
-    this.replyTimeoutSec = replyTimeoutSec;
+    this.shutdownTimeoutSec = shutdownTimeoutSec;
     this.flushThreshold = flushThreshold;
     ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder();
 
@@ -157,7 +157,7 @@ public class MCOutputCollector<V> extends TupleEntryCollector implements OutputC
       }
     finally
       {
-      client.shutdown( replyTimeoutSec, TimeUnit.SECONDS );
+      client.shutdown( shutdownTimeoutSec, TimeUnit.SECONDS );
       }
     }
   }

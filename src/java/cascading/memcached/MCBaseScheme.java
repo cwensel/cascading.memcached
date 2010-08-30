@@ -32,7 +32,8 @@ import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.OutputCollector;
 
 /**
- *
+ * Class MCBaseScheme is the base {@link Scheme} to be used with the {@link MCSinkTap} for storing
+ * key value pairs on a remote Memcached cluster.
  */
 public abstract class MCBaseScheme<I, V> extends Scheme
   {

@@ -35,9 +35,15 @@ public abstract class MCTupleEntryScheme<V> extends MCBaseScheme<TupleEntry, V>
 
   public MCTupleEntryScheme( Fields keyFields, Fields valueFields )
     {
+    this( keyFields, valueFields, ":" );
+    }
+
+  public MCTupleEntryScheme( Fields keyFields, Fields valueFields, String keyDelim )
+    {
     super( Fields.merge( keyFields, valueFields ) );
     this.keyFields = keyFields;
     this.valueFields = valueFields;
+    this.keyDelim = keyDelim;
     }
 
   public String getKeyDelim()
