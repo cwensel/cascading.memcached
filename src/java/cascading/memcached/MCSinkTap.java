@@ -36,7 +36,7 @@ public class MCSinkTap extends SinkTap
   {
   String hostnames = null;
   boolean useBinaryProtocol = true;
-  int shutdownTimeoutMin = 1;
+  int replyTimeoutSec = 5;
   int flushThreshold = 1000;
 
   public MCSinkTap( String hostnames, MCBaseScheme scheme )
@@ -50,17 +50,17 @@ public class MCSinkTap extends SinkTap
     this( hostnames, scheme, useBinaryProtocol, 1 );
     }
 
-  public MCSinkTap( String hostnames, MCBaseScheme scheme, boolean useBinaryProtocol, int shutdownTimeoutMin )
+  public MCSinkTap( String hostnames, MCBaseScheme scheme, boolean useBinaryProtocol, int replyTimeoutSec )
     {
-    this( hostnames, scheme, useBinaryProtocol, shutdownTimeoutMin, 1000 );
+    this( hostnames, scheme, useBinaryProtocol, replyTimeoutSec, 1000 );
     }
 
-  public MCSinkTap( String hostnames, MCBaseScheme scheme, boolean useBinaryProtocol, int shutdownTimeoutMin, int flushThreshold )
+  public MCSinkTap( String hostnames, MCBaseScheme scheme, boolean useBinaryProtocol, int replyTimeoutSec, int flushThreshold )
     {
     super( scheme );
     this.hostnames = hostnames;
     this.useBinaryProtocol = useBinaryProtocol;
-    this.shutdownTimeoutMin = shutdownTimeoutMin;
+    this.replyTimeoutSec = replyTimeoutSec;
     this.flushThreshold = flushThreshold;
     }
 
@@ -77,7 +77,7 @@ public class MCSinkTap extends SinkTap
 
   public TupleEntryCollector openForWrite( JobConf conf ) throws IOException
     {
-    return new MCOutputCollector( hostnames, useBinaryProtocol, shutdownTimeoutMin );
+    return new MCOutputCollector( hostnames, useBinaryProtocol, replyTimeoutSec );
     }
 
   @Override
