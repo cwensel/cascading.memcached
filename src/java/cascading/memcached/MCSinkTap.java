@@ -37,6 +37,7 @@ public class MCSinkTap extends SinkTap
   String hostnames = null;
   boolean useBinaryProtocol = true;
   int shutdownTimeoutMin = 1;
+  int flushThreshold = 1000;
 
   public MCSinkTap( String hostnames, MCBaseScheme scheme )
     {
@@ -51,10 +52,16 @@ public class MCSinkTap extends SinkTap
 
   public MCSinkTap( String hostnames, MCBaseScheme scheme, boolean useBinaryProtocol, int shutdownTimeoutMin )
     {
+    this( hostnames, scheme, useBinaryProtocol, shutdownTimeoutMin, 1000 );
+    }
+
+  public MCSinkTap( String hostnames, MCBaseScheme scheme, boolean useBinaryProtocol, int shutdownTimeoutMin, int flushThreshold )
+    {
     super( scheme );
     this.hostnames = hostnames;
     this.useBinaryProtocol = useBinaryProtocol;
     this.shutdownTimeoutMin = shutdownTimeoutMin;
+    this.flushThreshold = flushThreshold;
     }
 
   public Path getPath()

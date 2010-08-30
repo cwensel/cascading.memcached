@@ -22,6 +22,9 @@
 package cascading.memcached;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import cascading.tuple.Tuple;
@@ -31,15 +34,22 @@ import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.MemcachedClient;
 import net.spy.memcached.util.CacheLoader;
 import org.apache.hadoop.mapred.OutputCollector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  */
 public class MCOutputCollector<V> extends TupleEntryCollector implements OutputCollector<String, V>
   {
+  private static final Logger LOG = LoggerFactory.getLogger( MCOutputCollector.class );
+
   private MemcachedClient client;
   private CacheLoader cacheLoader;
-  private int shutdownTimeoutMin = 1;
+  private int replyTimeoutMin = 1;
+  private int flushThreshold = 1000;
+
+  private List<Future> futures = new LinkedList<Future>();
 
   MCOutputCollector( String hostnames ) throws IOException
     {
@@ -51,9 +61,15 @@ public class MCOutputCollector<V> extends TupleEntryCollector implements OutputC
     this( hostnames, useBinary, 1 );
     }
 
-  MCOutputCollector( String hostnames, boolean useBinary, int shutdownTimeoutMin ) throws IOException
+  MCOutputCollector( String hostnames, boolean useBinary, int replyTimeoutMin ) throws IOException
     {
-    this.shutdownTimeoutMin = shutdownTimeoutMin;
+    this( hostnames, useBinary, replyTimeoutMin, 1000 );
+    }
+
+  MCOutputCollector( String hostnames, boolean useBinary, int replyTimeoutMin, int flushThreshold ) throws IOException
+    {
+    this.replyTimeoutMin = replyTimeoutMin;
+    this.flushThreshold = flushThreshold;
     ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder();
 
     ConnectionFactoryBuilder.Protocol protocol = useBinary ? ConnectionFactoryBuilder.Protocol.BINARY : ConnectionFactoryBuilder.Protocol.TEXT;
@@ -67,7 +83,32 @@ public class MCOutputCollector<V> extends TupleEntryCollector implements OutputC
   @Override
   public void collect( String key, V value ) throws IOException
     {
-    cacheLoader.push( key, value );
+    futures.add( cacheLoader.push( key, value ) );
+
+    if( futures.size() >= flushThreshold )
+      flush();
+    }
+
+  private void flush()
+    {
+    try
+      {
+      for( Future future : futures )
+        {
+        try
+          {
+          future.get( replyTimeoutMin, TimeUnit.MINUTES );
+          }
+        catch( Exception exception )
+          {
+          LOG.warn( "failed receiving value", exception );
+          }
+        }
+      }
+    finally
+      {
+      futures.clear();
+      }
     }
 
   @Override
@@ -78,6 +119,7 @@ public class MCOutputCollector<V> extends TupleEntryCollector implements OutputC
   @Override
   public void close()
     {
-    client.shutdown( shutdownTimeoutMin, TimeUnit.MINUTES );
+    flush();
+    client.shutdown( replyTimeoutMin, TimeUnit.MINUTES );
     }
   }
